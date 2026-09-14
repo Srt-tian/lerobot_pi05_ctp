@@ -1,0 +1,46 @@
+--- a/src/misc/cudawrap.cc
++++ b/src/misc/cudawrap.cc
+@@ -10,6 +10,7 @@
+ #include "param.h"
+ #include "cudawrap.h"
+ #include <mutex>
++#include <dlfcn.h>
+ 
+ // This env var (NCCL_CUMEM_ENABLE) toggles cuMem API usage
+ NCCL_PARAM(CuMemEnable, "CUMEM_ENABLE", -2);
+@@ -169,6 +170,26 @@
+ 
+ #if CUDART_VERSION >= 11030
+ 
++// Resolve via driver v2 because this vGPU runtime drops query status.
++// Exact NCCL API versions and driver failures remain enforced.
++static cudaError_t ncclDriverQuery(const char* name, void** ptr, int version,
++                                  cudaDriverEntryPointQueryResult* status) {
++  using Query = CUresult (*)(const char*, void**, int, cuuint64_t, CUdriverProcAddressQueryResult*);
++  static void* driver = dlopen("libcuda.so.1", RTLD_NOW | RTLD_LOCAL);
++  static Query query = driver ? (Query)dlsym(driver, "cuGetProcAddress_v2") : nullptr;
++  *ptr = nullptr;
++  *status = cudaDriverEntryPointSymbolNotFound;
++  if (!query) return cudaErrorUnknown;
++  CUdriverProcAddressQueryResult result = CU_GET_PROC_ADDRESS_SYMBOL_NOT_FOUND;
++  CUresult rc = query(name, ptr, version, CU_GET_PROC_ADDRESS_DEFAULT, &result);
++  if (rc != CUDA_SUCCESS) return cudaErrorUnknown;
++  if (result == CU_GET_PROC_ADDRESS_SUCCESS && *ptr) {
++    *status = cudaDriverEntryPointSuccess;
++    return cudaSuccess;
++  }
++  return cudaErrorUnknown;
++}
++
+ #if CUDART_VERSION >= 13000
+ #define LOAD_SYM(symbol, version, ignore) do {                           \
+     cudaDriverEntryPointQueryResult driverStatus = cudaDriverEntryPointSymbolNotFound; \
+@@ -181,7 +202,7 @@
+ #elif CUDART_VERSION >= 12000
+ #define LOAD_SYM(symbol, version, ignore) do {                           \
+     cudaDriverEntryPointQueryResult driverStatus = cudaDriverEntryPointSymbolNotFound; \
+-    res = cudaGetDriverEntryPoint(#symbol, (void **) (&pfn_##symbol), cudaEnableDefault, &driverStatus); \
++    res = ncclDriverQuery(#symbol, (void **) (&pfn_##symbol), version, &driverStatus); \
+     if (res != cudaSuccess || driverStatus != cudaDriverEntryPointSuccess) { \
+       if (!ignore) {                                                    \
+         WARN("Retrieve %s failed with %d status %d", #symbol, res, driverStatus); \

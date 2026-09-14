@@ -1,0 +1,323 @@
+{
+  "dataset": {
+    "repo_id": "local/pens168_ctp",
+    "repo_type": "dataset",
+    "root": "/root/autodl-tmp/data/pens168_v30",
+    "episodes": null,
+    "exclude_episodes": null,
+    "image_transforms": {
+      "enable": false,
+      "max_num_transforms": 3,
+      "random_order": false,
+      "tfs": {
+        "brightness": {
+          "weight": 1.0,
+          "type": "ColorJitter",
+          "kwargs": {
+            "brightness": [
+              0.8,
+              1.2
+            ]
+          }
+        },
+        "contrast": {
+          "weight": 1.0,
+          "type": "ColorJitter",
+          "kwargs": {
+            "contrast": [
+              0.8,
+              1.2
+            ]
+          }
+        },
+        "saturation": {
+          "weight": 1.0,
+          "type": "ColorJitter",
+          "kwargs": {
+            "saturation": [
+              0.5,
+              1.5
+            ]
+          }
+        },
+        "hue": {
+          "weight": 1.0,
+          "type": "ColorJitter",
+          "kwargs": {
+            "hue": [
+              -0.05,
+              0.05
+            ]
+          }
+        },
+        "sharpness": {
+          "weight": 1.0,
+          "type": "SharpnessJitter",
+          "kwargs": {
+            "sharpness": [
+              0.5,
+              1.5
+            ]
+          }
+        },
+        "affine": {
+          "weight": 1.0,
+          "type": "RandomAffine",
+          "kwargs": {
+            "degrees": [
+              -5.0,
+              5.0
+            ],
+            "translate": [
+              0.05,
+              0.05
+            ]
+          }
+        }
+      }
+    },
+    "revision": null,
+    "use_imagenet_stats": true,
+    "video_backend": "pyav",
+    "return_uint8": false,
+    "depth_output_unit": "mm",
+    "streaming": false,
+    "eval_split": 0.1
+  },
+  "env": null,
+  "policy": {
+    "type": "pi05",
+    "n_obs_steps": 1,
+    "input_features": {
+      "observation.images.cam_front": {
+        "type": "VISUAL",
+        "shape": [
+          3,
+          480,
+          640
+        ]
+      },
+      "observation.images.cam_left": {
+        "type": "VISUAL",
+        "shape": [
+          3,
+          480,
+          640
+        ]
+      },
+      "observation.images.cam_right": {
+        "type": "VISUAL",
+        "shape": [
+          3,
+          480,
+          640
+        ]
+      },
+      "observation.state": {
+        "type": "STATE",
+        "shape": [
+          14
+        ]
+      }
+    },
+    "output_features": {
+      "action": {
+        "type": "ACTION",
+        "shape": [
+          14
+        ]
+      }
+    },
+    "device": "cuda",
+    "use_amp": false,
+    "use_peft": false,
+    "push_to_hub": false,
+    "repo_id": null,
+    "private": null,
+    "tags": null,
+    "license": null,
+    "pretrained_path": "/root/autodl-tmp/models/pi05_base_pens168_init",
+    "pretrained_revision": null,
+    "paligemma_variant": "gemma_2b",
+    "action_expert_variant": "gemma_300m",
+    "dtype": "float32",
+    "chunk_size": 50,
+    "n_action_steps": 50,
+    "use_visual_memory": false,
+    "use_proprioceptive_memory": false,
+    "memory_frames": 6,
+    "memory_stride": 30,
+    "memory_temporal_attention_every": 4,
+    "max_state_dim": 32,
+    "max_action_dim": 32,
+    "num_inference_steps": 10,
+    "time_sampling_beta_alpha": 1.5,
+    "time_sampling_beta_beta": 1.0,
+    "time_sampling_scale": 0.999,
+    "time_sampling_offset": 0.001,
+    "min_period": 0.004,
+    "max_period": 4.0,
+    "ctp_enabled": true,
+    "ctp_num_modes": 4,
+    "ctp_min_width": 0.02,
+    "ctp_max_width": 0.5,
+    "ctp_initial_width": 0.15,
+    "ctp_overlap_weight": 0.1,
+    "ctp_probability_floor": 0.0,
+    "ctp_entropy_target_effective_modes": 1.0,
+    "ctp_entropy_weight": 0.0,
+    "ctp_overlap_probability_weighted": true,
+    "ctp_overlap_detach_widths": false,
+    "ctp_inference_mode": "top1",
+    "ctp_belief_self_transition": 0.95,
+    "ctp_belief_observation_weight": 1.0,
+    "ctp_belief_release_ratio": 4.0,
+    "ctp_belief_transport_temperature": 0.1,
+    "ctp_belief_confidence_threshold": 0.0,
+    "ctp_belief_probability_floor": 0.0001,
+    "ctp_belief_cumulative_action_dims": 0,
+    "use_relative_actions": false,
+    "relative_exclude_joints": [
+      "gripper"
+    ],
+    "action_feature_names": null,
+    "rtc_config": null,
+    "rtc_training_max_delay": 0,
+    "image_resolution": [
+      224,
+      224
+    ],
+    "empty_cameras": 0,
+    "tokenizer_max_length": 200,
+    "text_tokenizer_name": "/root/autodl-tmp/models/paligemma_tokenizer",
+    "normalization_mapping": {
+      "VISUAL": "IDENTITY",
+      "STATE": "QUANTILES",
+      "ACTION": "QUANTILES"
+    },
+    "gradient_checkpointing": true,
+    "compile_model": false,
+    "compile_mode": "max-autotune",
+    "freeze_vision_encoder": false,
+    "train_expert_only": false,
+    "optimizer_lr": 2.5e-05,
+    "optimizer_betas": [
+      0.9,
+      0.95
+    ],
+    "optimizer_eps": 1e-08,
+    "optimizer_weight_decay": 0.01,
+    "optimizer_grad_clip_norm": 1.0,
+    "scheduler_warmup_steps": 1000,
+    "scheduler_decay_steps": 20000,
+    "scheduler_decay_lr": 2.5e-06
+  },
+  "reward_model": null,
+  "output_dir": "/root/autodl-tmp/outputs/pi05_ctp_pens168_debug",
+  "job_name": "pi05_ctp_pens168_debug",
+  "resume": false,
+  "seed": 42,
+  "cudnn_deterministic": false,
+  "num_workers": 4,
+  "batch_size": 8,
+  "prefetch_factor": 2,
+  "persistent_workers": true,
+  "dataloader_multiprocessing_context": "spawn",
+  "steps": 100,
+  "env_eval_freq": 0,
+  "log_freq": 10,
+  "eval_steps": 50,
+  "max_eval_samples": 32,
+  "tolerance_s": 0.01,
+  "save_checkpoint": true,
+  "save_freq": 50,
+  "checkpoint_keep_last": 1,
+  "checkpoint_min_free_gb": 10,
+  "checkpoint_format": "dcp",
+  "use_policy_training_preset": true,
+  "optimizer": null,
+  "scheduler": null,
+  "parallelism": {
+    "dp_replicate": 1,
+    "dp_shard": 4,
+    "context_parallel": {
+      "ring_degree": 1,
+      "ulysses_degree": 1
+    },
+    "cfg_parallel": 1
+  },
+  "accelerator": {
+    "mixed_precision": "bf16",
+    "gradient_accumulation": {
+      "steps": 1
+    },
+    "fsdp": {
+      "reshard_after_forward": true,
+      "wrap_modules": [
+        "Linear",
+        "Embedding"
+      ],
+      "min_num_params": null,
+      "cpu_offload": false,
+      "ignored_modules": null
+    },
+    "ddp": {
+      "find_unused_parameters": true,
+      "gradient_as_bucket_view": false,
+      "static_graph": false
+    },
+    "compile": {
+      "enabled": false,
+      "backend": "inductor",
+      "mode": null,
+      "regional": true
+    },
+    "activation_checkpointing": {
+      "mode": "none"
+    }
+  },
+  "eval": {
+    "n_episodes": 50,
+    "batch_size": 50,
+    "use_async_envs": true,
+    "recording": false,
+    "recording_repo_id": null,
+    "recording_private": false
+  },
+  "ema": {
+    "enable": false,
+    "decay": null,
+    "update_after_step": 0,
+    "inv_gamma": 1.0,
+    "power": 0.75,
+    "min_decay": 0.0,
+    "max_decay": 0.9999,
+    "use_for_eval": true
+  },
+  "wandb": {
+    "enable": true,
+    "disable_artifact": true,
+    "project": "pi05-ctp-pen168",
+    "entity": null,
+    "notes": null,
+    "run_id": null,
+    "resume": null,
+    "mode": "online",
+    "console": "wrap",
+    "console_multipart": false,
+    "console_chunk_max_seconds": 0,
+    "add_tags": false
+  },
+  "peft": null,
+  "job": {
+    "target": null,
+    "image": "huggingface/lerobot-gpu:latest",
+    "timeout": "2d",
+    "detach": false,
+    "tags": []
+  },
+  "save_checkpoint_to_hub": false,
+  "sample_weighting": null,
+  "rename_map": {},
+  "checkpoint_path": null
+}
